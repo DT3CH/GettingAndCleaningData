@@ -11,97 +11,29 @@ Data Abstract : Human Activity Recognition database built from the recordings of
 
 #--------------------------------------------------------------------------------------------------------------------
 
-From the provided Data archive the following text files were joined to form a new data table:
+The script run_analysis.R performs the 5 steps described in the course project's definition.
 
-	ID - test/subject_test.txt : a vector giving the patient's ID number  1-30
-	Labels - X_test ; y_test: vector stating the patient's activity 1-6
-	1 WALKING
-	2 WALKING_UPSTAIRS
-	3 WALKING_DOWNSTAIRS
-	4 SITTING
-	5 STANDING
-	6 LAYING
-	- Variables -  either test or trainning , actual measuremeants from tri axial accelormeter or gyroscope
-	- Group <- Either ‘test’ patients and ’training’ patients
-	- feature.txt:  A vector of column names for test/X_test.txt,  only std or mean values were kept (out of 561).  
-	  the resulting vector is used for column names over the variable data_set.
-	  
-tAccMeanX          
-tAccMeanY
-tAccMeanZ          
-tAccStdX
-tAccStdY            
-tAccStdZ
-tGravityAccMeanX    
-tGravityAccMeanY
-tGravityAccMeanZ    
-tGravityAccStdX
-tGravityAccStdY    
-tGravityAccStdZ
-tAccJerkMeanX       
-tAccJerkMeanY
-tAccJerkMeanZ       
-tAccJerkStdX
-tAccJerkStdY        
-tAccJerkStdZ
-tGyroMeanX          
-tGyroMeanY
-tGyroMeanZ          
-tGyroStdX
-tGyroStdY          
-tGyroStdZ
-tGyroJerkMeanX      
-tGyroJerkMeanY
-tGyroJerkMeanZ      
-tGyroJerkStdX
-tGyroJerkStdY       
-tGyroJerkStdZ
-tAccMagMean         
-tAccMagStd
-tGravityAccMagMean 
-tGravityAccMagStd
-tAccJerkMagMean    
-tAccJerkMagStd
-tGyroMagMean      
-tGyroMagStd
-tGyroJerkMagMean    
-tGyroJerkMagStd
-fAccMeanX         
-fAccMeanY
-fAccMeanZ          
-fAccStdX
-fAccStdY           
-fAccStdZ
-fAccMeanFreqX       
-fAccMeanFreqY
-fAccMeanFreqZ       
-fAccJerkMeanX
-fAccJerkMeanY       
-fAccJerkMeanZ
-fAccJerkStdX        
-fAccJerkStdY
-fAccJerkStdZ       
-fAccJerkMeanFreqX
-fAccJerkMeanFreqY  
-fAccJerkMeanFreqZ
-fGyroMeanX         
-fGyroMeanY
-fGyroMeanZ          
-fGyroStdX
-fGyroStdY           
-fGyroStdZ
-fGyroMeanFreqX      
-fGyroMeanFreqY
-fGyroMeanFreqZ     
-fAccMagMean
-fAccMagStd         
-fAccMagMeanFreq
-fAccJerkMagMean     
-fAccJerkMagStd
-fAccJerkMagMeanFreq 
-fGyroMagMean
-fGyroMagStd        
-fGyroMagMeanFreq
-fGyroJerkMagMean   
-fGyroJerkMagStd
-fGyroJerkMagMeanFreq
+Merges the training and the test sets to create one data set.
+Extracts only the measurements on the mean and standard deviation for each measurement. 
+Uses descriptive activity names to name the activities in the data set
+Appropriately labels the data set with descriptive variable names. 
+From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+
+Variables :
+
+	x_train,x_test,y_train,y_test, subject_test, subject_train: all contain data from the separate text files to be merged 	into a new data set
+	
+	x_set, y_set, and subject_set are the resulting tables after the merging of (x_test,x_train), (y_test, y_train), 		(subject_test,subject_train)
+	
+	features : contains variable names for columns in the x_set data table
+	
+	filter_features:  contains variable names for columns containing only STD or MEAN values and is applied to x_set
+	
+	activity :  activity lables from file activity.txt that replace values 1:6 in the y_set table
+	
+	total_sets: the merging of subject_set, y_set and x-set to produce a new data set comprised of only STD and MEAN 		variables
+	
+	mean_total_sets:  printed file that returns 180 records,  mean of the table according to activity and set
+	
+	
+	
