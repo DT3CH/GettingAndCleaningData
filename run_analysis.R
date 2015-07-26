@@ -3,117 +3,83 @@
 ##course project
 
 
+##Run Analyasis  script
+##load plyr library
+library(plyr)
 
-setwd("G:/R Code/analysis/UCI HAR Dataset")
-filepathBase <- "G:/R Code/analysis/UCI HAR Dataset/"
-##read activity labels into a table from activity_lables.txt
-
-dfActivityLabels <- read.table(file = paste0(filepathBase,"activity_labels.txt"),
-                                  header = F, sep = " ", col.names = c("activity_id", "activity_label"))
-
-#load features as columns for new data set
-
-dfColNames <- read.table(file= paste0(filepathBase,"features.txt"),
-                         header = F, sep = " ", col.names = c("feature_id", "feature_label"))
+##This script will run the analysis on the supplied data archive and return the desired 
+##Tidy data set of mean values of the selected features.
+#load all data sets into tables X_train, y_train, Labels, features
 
 
+## Overall initial goal : Merge all the data sets into a new single data set
 
-#create new data set merged from trainning and test data sets
-#then create a new data set from parameters in project
-#------------------------------------------------------------------
-dirfiles <- list.files("./UCI HAR Dataset/test")
-#read ID numbers from subject_test file 1:30
-ID <- read.table("G:/R Code/analysis/UCI HAR Dataset/test/subject_test.txt")
+## Subset 1) gather all training data and subject training labels from supplied archive
+x_train <- read.table("./train/X_train.txt")
+y_train <- read.table("./train/y_train.txt")
+#subject who performed the training
+subject_train <- read.table("./train/subject_train.txt")
 
-dim(ID)
-names(ID) <- c("ID")
-
-#  test_labels vector contains label (walking, walking_upstairs etc...) information 
-test_labels<- read.table("G:/R Code/analysis/UCI HAR Dataset/test/y_test.txt")
-dim(test_labels)
-names(test_labels) <- c("Labels")
-
-#read data from X_test.txt, only want to keep std and mean or 1:6 in data set
-test_Variables <- read.table("G:/R Code/analysis/UCI HAR Dataset/test/X_test.txt")
-dim(test_Variables)
-#create vector of names to use as column names in test_variable
-test_names <- as.character(dfColNames$feature_label)
-names(test_Variables) <- test_names
-##filter out columns without std OR mean in them measurments
-test_Variables <- test_Variables[, grep("-mean\\(\\)|-std\\(\\)", names(test_Variables))]
-##clean up test_variables data
-
-names(test_Variables) <- gsub("-mean", "Mean", names(test_Variables))
-names(test_Variables) <- gsub("-std", "STD", names(test_Variables))
-names(test_Variables) <- gsub("\\(", "", names(test_Variables))
-names(test_Variables) <- gsub("\\)", "", names(test_Variables))
-names(test_Variables) <- gsub("-", "", names(test_Variables))
-names(test_Variables) <- gsub("Body", "", names(test_Variables))
-names(test_Variables) <- gsub("Acc", "Acceleration", names(test_Variables))
-names(test_Variables) <- gsub("Gyro", "Gyroscopic", names(test_Variables))
-names(test_Variables) <- gsub("Mag", "Magnitude", names(test_Variables))
-names(test_Variables) <- gsub("BodyBody", "Body2", names(test_Variables))
-#names(test_Variables) <- gsub("Gravity", "Gravity", names(test_Variables))
-names(test_Variables) <- gsub("^t", "Time", names(test_Variables))
-names(test_Variables) <- gsub("^f", "Frequency", names(test_Variables))
-
-## Merge/ Join activities with the metadata in dfActiityLabels
-
-test_category <- data.frame(rep("test", nrow(test_Variables)))
-names(test_category) <- c("Group")
-
-testData <- cbind(ID,test_category,test_labels,test_Variables)
+## Subset 2) gather all test data and subject test labels from supplied archive
+#test set and lables
+x_test <- read.table("./test/X_test.txt")
+y_test <- read.table("./test/y_test.txt")
+#subject who performed test
+subject_test <- read.table("./test/subject_test.txt")
 
 
-##repeat steps for train data sets 
+## Merge Set step 1) merge the 'x'(test/train) sets to make one set containing both x training and test data
+x_set <- rbind(x_test, x_train)
+## Merge Set step 2) merge the 'y'(test/train) sets to make one set containing both y training and test data
+y_set <- rbind(y_test, y_train)
+#Merge Set step 3) join all subject data from the train and test folders
+subject_set <- rbind(subject_test, subject_train)
+
+##End intial goal current sets : y_set, x_set, subject_set
 
 
-## The ID vector contains the patients ID (1:30)
-ID <- read.table("./train/subject_train.txt")  
-dim(ID)
-## Name the vector 'ID'
-names(ID) <- c("ID")
+## Second goal : extract data from the mean and std feature table , use feature table vector names as 
+## new data set column names
 
-## The train_labels Vector contains the label information (1:6 <- WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING)
-train_labels <- read.table("./train/y_train.txt") 
-dim(train_labels)
-## Name the vector 'train_labels'
-names(train_labels) <- c("Labels")
+## extract only mean | std labels from the features.txt file
+features <- read.table("features.txt")
+#return vector of numbers that have mean or std data
+filter_features <- grep("-(mean|std)\\(\\)", features[, 2])
+## subset set columns in x_set and then apply column names from filter_feature
+x_set <- x_set[,filter_features]
+names(x_set) <-features[filter_features, 2]
 
-train_Variables <- read.table("./train/X_train.txt") 
-dim(train_Variables)
-names(train_Variables) <- train_Variables
+##End Second Goal modified sets, x_set now has column names from feature.txt
 
-train_names <- as.character(dfColNames$feature_label)
-names(train_Variables) <- train_names
+## Overall Goal 3 : Name activities in the data set using the activity_labels.txt file, replace numbers 1:6
+## in y_train and y_test with labels
 
+#read in activity_lables to a vector
+activity <- read.table("activity_labels.txt")
 
+#replace y_set names with activity labels
+y_set[,1] <- activity[y_set[,1], 2]
 
-train_Variables <- train_Variables[, grep("-mean\\(\\)|-std\\(\\)", names(train_Variables))]
+#rename y_set column
+names(y_set) <- "activity"
 
-## Clean up the column names
-names(train_Variables) <- gsub("-mean", "Mean", names(train_Variables))
-names(train_Variables) <- gsub("-std", "STD", names(train_Variables))
-names(train_Variables) <- gsub("\\(", "", names(train_Variables))
-names(train_Variables) <- gsub("\\)", "", names(train_Variables))
-names(train_Variables) <- gsub("-", "", names(train_Variables))
-names(train_Variables) <- gsub("Body", "", names(train_Variables))
-names(train_Variables) <- gsub("Acc", "Acceleration", names(train_Variables))
-names(train_Variables) <- gsub("Gyro", "Gyroscopic", names(train_Variables))
-names(train_Variables) <- gsub("Mag", "Magnitude", names(train_Variables))
-names(train_Variables) <- gsub("BodyBody", "Body2", names(train_Variables))
-#names(train_Variables) <- gsub("Gravity", "Gravity", names(train_Variables))
-names(train_Variables) <- gsub("^t", "Time", names(train_Variables))
-names(train_Variables) <- gsub("^f", "Frequency", names(train_Variables))
+##End Third Goal modified sets, y_set now has activity as column name, and activity lables for 1:6
 
+##Overall Goal 4 : Appropriately labels the data set with descriptive variable names. 
+names(subject_set) <- "subject"
+##bind all columns together into a new data set
+total_sets <- cbind(subject_set, y_set ,x_set)
 
-## Create a 'Group' category so we know which rows are from the training group
-train_category <- data.frame(rep("train", nrow(train_Variables)))
-names(train_category) <- c("Group")
+## Merge Sets 3) subject , y_set and x_set are now one main set of data that can be itself subset
+##End Fourth Goalnew data set total_sets contains all previously merged sets with only std or mean variables
 
-train_Data <- cbind(ID, train_category, train_labels, train_Variables)
+## Final Goal 5 : From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
-UCItidy <- rbind(testData, train_Data)
+##find means of values using ddply (dplyr package) to subset the vector by subject and activity
+# then apply colMeans function and write file
+mean_total_data <- ddply(total_sets, .(subject, activity), function(x) colMeans(x[,3:68]))
 
-write.table(UCItidy, file = "./UCIdata.txt", col.names=TRUE, row.names=FALSE)
+write.table(mean_total_data, file = "UCIdata.txt", row.names = F)
+
+##End Fifth Goal subset the new data set and write the mean data according to subject and activity.
 
