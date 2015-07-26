@@ -33,7 +33,7 @@ Variables :
 	
 	total_sets: the merging of subject_set, y_set and x-set to produce a new data set comprised of only STD and MEAN 		variables
 	
-	mean_total_sets:  printed file that returns 180 records,  mean of the table according to activity and set
+	mean_total_sets:  printed file that returns 180 records,  mean of the table according to activity and subject, using the ddply function.
 	
 	
 	
