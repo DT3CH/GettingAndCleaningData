@@ -21,7 +21,7 @@ From the provided Data archive the following text files were joined to form a ne
 	4 SITTING
 	5 STANDING
 	6 LAYING
-	- Variables -  either test or trainning , actual mea
+	- Variables -  either test or trainning , actual measuremeants from tri axial accelormeter or gyroscope
 	- Group <- Either ‘test’ patients and ’training’ patients
 	- feature.txt:  A vector of column names for test/X_test.txt,  only std or mean values were kept (out of 561).  
 	  the resulting vector is used for column names over the variable data_set.
